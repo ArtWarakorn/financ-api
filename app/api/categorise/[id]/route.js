@@ -1,12 +1,19 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 
-export async function GET() {
+export async function PUT(request, { params }) {
+  const { id } = await params;
+  const body = await request.json();
+
+  const { name, type, icon } = body;
+
   const { data, error } = await supabase
     .schema("financ")
     .from("categories")
-    .select("*")
-    .order("created_at", { ascending: false });
+    .update({ name, type, icon })
+    .eq("id", id)
+    .select()
+    .single();
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -15,21 +22,18 @@ export async function GET() {
   return NextResponse.json({ data }, { status: 200 });
 }
 
-export async function POST(request) {
-  const body = await request.json();
+export async function DELETE(request, { params }) {
+  const { id } = params;
 
-  const { name, type, icon } = body;
-
-  const { data, error } = await supabase
+  const { error } = await supabase
     .schema("financ")
     .from("categories")
-    .insert([{ name, type, icon }])
-    .select()
-    .single();
+    .delete()
+    .eq("id", id);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ data }, { status: 201 });
+  return NextResponse.json({ message: "Category deleted" }, { status: 200 });
 }
