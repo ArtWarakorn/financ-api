@@ -23,7 +23,7 @@ export async function PUT(request, { params }) {
 }
 
 export async function DELETE(request, { params }) {
-  const { id } = awaitparams;
+  const { id } = await params;
 
   const { error } = await supabase
     .schema("financ")
